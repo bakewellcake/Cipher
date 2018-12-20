@@ -1,3 +1,5 @@
+var cipher = require('./cipher')
+
 var cond = [{arg:'-e',opt:true},{arg:'-d',opt:true},{arg:'-k',opt:false}]
 var args = process.argv
 var nargs = cond.filter(a => a.opt === false).length + (cond.filter(a => a.opt === true).length > 0 ? 1 : 0)
@@ -5,41 +7,7 @@ var valid = cond.every(a => a.opt === true ? args.filter(b => cond.filter(c => c
 
 function argsError () { console.log('Argument error') }
 
-function numToAscii(num) {
-    if (num >= 0 && num < 25) return String.fromCharCode(num + 97)
-    if (num >= 25 && num < 53) return String.fromCharCode(num + 38)
-    if (num >= 53 && num < 62) return String.fromCharCode(num - 5)
-}
-
-function numToHex(num) {
-    return numToAscii(Math.floor(num / 62)) + numToAscii(num % 62)
-}
-
-function asciiToNum(num) {
-    if (num >= 97 && num < 123) return num - 97
-    if (num >= 65 && num < 91) return num - 38
-    if (num >= 48 && num < 58) return num + 5
-}
-
-function hexToNum(hex) {
-    return (62 * asciiToNum(hex.charCodeAt(0))) + asciiToNum(hex.charCodeAt(1))
-}
-
-function cipher(v, k, e) {
-    var result = ''
-    for (var a = 0; a < v.length; a+= (e === true ? 1 : 2)) {
-        var cct = e === true ? v.charCodeAt(a) : hexToNum(v[a] + v[a + 1])
-        for (var b = 0; b < k.length; b++) {
-            var cck = k.charCodeAt(b)
-            cct ^= cck
-        }
-        result += e === true ? numToHex(cct) : String.fromCharCode(cct)
-    }
-    return result
-}
-
 if (valid === true && args.length - 2 === nargs * 2) {
-    var test = cond.filter(b => b.opt === true && b.arg === '-d')
     var marg = args.filter(a => cond.filter(b => b.opt === true && b.arg === a).map(b => b.arg).includes(a))[0]
     var text = args[args.indexOf(marg) + 1]
     var key = args[args.indexOf('-k') + 1]
@@ -47,10 +15,10 @@ if (valid === true && args.length - 2 === nargs * 2) {
 
     switch (marg) {
         case '-e':
-            value = cipher(text, key, true)
+            value = cipher.encrypt(text, key)
             break;
         case '-d':
-            value = cipher(text, key, false)
+            value = cipher.decyrpt(text, key)
             break;
         default:
             argsError()

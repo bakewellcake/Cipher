@@ -1,0 +1,8 @@
+{
+    "name": "cipher",
+    "version": "0.0.0",
+    "description": "Cipher tool to encrypt/decrypt data with key",
+    "main": "cipher.js",
+    "author": "Hayden",
+    "dependencies": {}
+}
